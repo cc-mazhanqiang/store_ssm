@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.whoops.store.dao.ManagerUserMapper">
+  <resultMap id="BaseResultMap" type="com.whoops.store.bean.ManagerUser">
+    <result column="id" jdbcType="INTEGER" property="id" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+  </resultMap>
+  <!--封装前台用户对象-->
+  <resultMap id="viewUserMap" type="com.whoops.store.bean.ViewsUser">
+    <result column="id" jdbcType="INTEGER" property="id" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="phoneNum" jdbcType="VARCHAR" property="phoneNum" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="gender" jdbcType="VARCHAR" property="gender" />
+  </resultMap>
+
+  <resultMap id="goodsType" type="com.whoops.store.bean.GoodsType">
+    <result column="typeId" jdbcType="INTEGER" property="typeId" />
+    <result column="typeName" jdbcType="VARCHAR" property="typeName" />
+  </resultMap>
+
+  <resultMap id="goods" type="com.whoops.store.bean.Goods">
+    <result column="goodId" jdbcType="INTEGER" property="goodId"/>
+    <result column="typeId" jdbcType="INTEGER" property="typeId"/>
+    <result column="goodName" jdbcType="VARCHAR" property="goodName"/>
+    <result column="image" jdbcType="VARCHAR" property="image"/>
+    <result column="price" jdbcType="DECIMAL" property="price"/>
+    <result column="star" jdbcType="INTEGER" property="star"/>
+    <result column="total" jdbcType="INTEGER" property="total"/>
+    <result column="addTime" jdbcType="DATE" property="addTime"/>
+    <result column="detail" jdbcType="VARCHAR" property="detail"/>
+    <!-- 指定联合查询出的商品种类字段的封装 -->
+    <association property="goodsType" javaType="com.whoops.store.bean.GoodsType">
+      <result column="typeId" jdbcType="INTEGER" property="typeId"/>
+      <result column="typeName" jdbcType="VARCHAR" property="typeName"/>
+    </association>
+  </resultMap>
+
+  <select id="selectByUserNameAndPassword" resultMap="BaseResultMap">
+    select * from manager_user where
+    username = #{username,jdbcType=VARCHAR} and password = #{password,jdbcType=VARCHAR}
+  </select>
+
+  <select id="findAllUser" resultMap="viewUserMap">
+    select * from views_user
+  </select>
+
+  <delete id="delUser">
+    delete from views_user where id=#{id}
+  </delete>
+
+  <select id="findAllUserByUserNameAndGender" resultMap="viewUserMap">
+    select * from views_user where username=#{username,jdbcType=VARCHAR}
+  </select>
+
+  <insert id="addGoodsType" parameterType="com.whoops.store.bean.GoodsType">
+    insert into goodstype(typeName) values(#{typeName})
+  </insert>
+
+  <select id="findGoodsTypeName" resultMap="goodsType">
+    select * from goodsType
+  </select>
+
+  <insert id="addGoods" parameterType="com.whoops.store.bean.Goods">
+    insert into goods(typeId,goodName,image,price,star,total,addTime,detail)
+    values(#{typeId},#{goodName},#{image},#{price},#{star},#{total},#{addTime},#{detail})
+  </insert>
+
+  <select id="findAllGoods" resultMap="goods">
+    select g.goodId,gt.typeName,g.goodName,g.price,g.star,g.total,g.addTime
+    from goods g
+    left join goodstype gt
+    on g.typeId = gt.typeId
+    order by g.goodId
+  </select>
+
+  <delete id="delGoods">
+    delete from goods where goodId=#{goodId}
+  </delete>
+
+  <select id="findGoodsById" resultMap="goods">
+    select * from goods where goodId = #{goodId}
+  </select>
+
+  <!--批量删除-->
+  <delete id="delBatch" parameterType="java.util.List">
+    delete from goods where goodId in
+    <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+        #{item}
+    </foreach>
+  </delete>
+
+  <!--根据goodName、typeName查询商品-->
+  <select id="findGoodsByGoodNameAndTypeName" resultMap="goods">
+    select g.goodId,gt.typeName,g.goodName,g.price,g.star,g.total,g.addTime
+    from goods g
+    left join goodstype gt
+    on g.typeId = gt.typeId
+    where g.goodName = #{goodName} and gt.typeName = #{typeName}
+    order by g.goodId
+  </select>
+
+  <select id="findGoodsByGoodCondition" resultMap="goods">
+    select g.goodId,gt.typeName,g.goodName,g.price,g.star,g.total,g.addTime
+    from goods g
+    left join goodstype gt
+    on g.typeId = gt.typeId
+    where g.goodName = #{condition} or gt.typeName = #{condition}
+    order by g.goodId
+  </select>
+
+  <!--查询商品图片、价格、数量、评分、detail-->
+  <select id="getGoodsById" resultMap="goods">
+    select goodId,goodName,image,price,total,star,detail
+    from goods where goodId = #{goodId}
+  </select>
+
+  <update id="updateGoods">
+    update goods set price = #{goods.price},total = #{goods.total},star = #{goods.star}
+    where goodId = #{goodId}
+  </update>
+
+</mapper>

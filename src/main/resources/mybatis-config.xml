@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <!--开启驼峰式命名规则-->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!--使用log4j日志-->
+        <setting name="logImpl" value="LOG4J"/>
+    </settings>
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <!--
+            分页合理化参数，当pageNum<0的时候，默认查询第一页数据
+            当pageNum大于最后一页的时候，默认查询最后一页的数据
+            -->
+            <property name="reasonable" value="true"/>
+        </plugin>
+    </plugins>
+
+</configuration>
