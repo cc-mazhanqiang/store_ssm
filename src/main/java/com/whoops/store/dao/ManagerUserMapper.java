@@ -29,7 +29,7 @@ public interface ManagerUserMapper {
 
     int delBatch(List<Integer> list_ids);
 
-    Goods findGoodsByGoodNameAndTypeName(@Param("goodName") String goodName, @Param("typeName") String typeName);
+    List<Goods> findGoodsByGoodNameAndTypeName(@Param("goodName") String goodName, @Param("typeName") String typeName);
 
     List<Goods> findGoodsByGoodCondition(@Param("condition") String condition);
 

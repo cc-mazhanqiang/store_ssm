@@ -333,10 +333,7 @@ public class ManagerController {
     @GetMapping("/manager/searchGoods")
     public Map<String,Object> searchGoods(@RequestParam(value = "pageNum",defaultValue = "1")Integer pageNum,@RequestParam("condition")String condition){
         Map<String,Object> map = new HashMap<>();
-        //处理返回的数据的容器名称list
-        List<Map<String,Object>> list = new ArrayList<>();
         try {
-            Map<String,Object> ret = new HashMap<>();
             if (condition.contains(",")){
                 //多条件查询adasd,饮品
                 String[] str_cons = condition.split(",");
@@ -347,11 +344,12 @@ public class ManagerController {
                     typeName = str_cons[1];
                 }
                 System.out.println(goodName+","+typeName);
-                Goods goods = managerService.findGoodsByGoodNameAndTypeName(goodName,typeName);
-                if (goods == null)throw new Exception("没有查询到相关的商品！");
-                ret.put("list",goods);
-                list.add(ret);
-                map.put("page",list);
+                PageHelper.startPage(pageNum,5);
+                List<Goods> goodsList = managerService.findGoodsByGoodNameAndTypeName(goodName,typeName);
+                if (goodsList == null || goodsList.size() == 0)throw new Exception("没有查询到相关的商品！");
+                //navigatePage:分页导航条的显示
+                PageInfo pageInfo = new PageInfo(goodsList,5);
+                map.put("page",pageInfo);
                 map.put("success",true);
                 map.put("msg","查询商品成功！");
             }else{

@@ -79,7 +79,7 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
-    public Goods findGoodsByGoodNameAndTypeName(String goodName, String typeName) {
+    public List<Goods> findGoodsByGoodNameAndTypeName(String goodName, String typeName) {
         return managerUserMapper.findGoodsByGoodNameAndTypeName(goodName,typeName);
     }
 

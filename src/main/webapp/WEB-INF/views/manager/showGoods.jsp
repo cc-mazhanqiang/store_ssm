@@ -205,6 +205,34 @@
 				searchWithCondition(1);
 
 			});
+			//显示商品信息返回的数据是list
+			function showMsg1(data){
+				//每次刷新清空表格数据
+				$("tbody").empty();
+				var goods = data.page;
+				var checkBox = $("<td><input type='checkbox' class='check_item' ></td>");
+				var goodId = $("<td></td>").append(goods.goodId);
+				var typeName = $("<td></td>").append(goods.goodsType.typeName);
+				var goodName = $("<td></td>").append(goods.goodName);
+				var price = $("<td></td>").append(goods.price);
+				var star = $("<td></td>").append(goods.star);
+				var total = $("<td></td>").append(goods.total);
+				var addTime = $("<td></td>").append(goods.addTime);
+				<%--var img = $("<img></img>").css({width:"60px",height:"100px"}).attr("src","${PATH}/"+this.image);--%>
+				<%--var image = $("<td></td>").append(img);--%>
+				//查看详情的按钮
+				var check = $("<button></button>").addClass("btn btn-primary btn-sm check_btn")
+						.append("<span></span>").addClass("glyphicon glyphicon-tasks");
+				check.attr("good_id",this.goodId);
+				//删除的按钮
+				var delBtn = $("<button></button>").addClass("btn btn-danger btn-sm delete_btn")
+						.append("<span></span>").addClass("glyphicon glyphicon-trash");
+				var btn =$("<td></td>").append(check).append(" ").append(delBtn);
+				delBtn.attr("good_id",this.goodId);
+				$("<tr></tr>").append(checkBox).append(goodId).append(typeName).append(goodName)
+						.append(price).append(star).append(total).append(addTime)
+						.append(btn).appendTo($("tbody"));
+			}
 
 			//条件查询
 			function searchWithCondition(pageNum){
@@ -223,9 +251,15 @@
 					success:function (data) {
 						console.log(data);//每次刷新清空表格数据
 						if (data.success ===true){
-							showMsg(data);
-							page_info1(data);
-							page_nav2(data);
+						    if (data.page.list === undefined) {
+						    	showMsg1(data);
+								page_info1(data);
+								page_nav2(data);
+							}else {
+								showMsg(data);
+								page_info1(data);
+								page_nav2(data);
+							}
 						}else {
 							commonUtil.message(data.exc1,"danger");
 						}

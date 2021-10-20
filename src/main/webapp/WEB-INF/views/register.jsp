@@ -17,6 +17,7 @@
                 var usernamePatt = /(^\w{5,12}$)|(^[\u2E80-\u9FFF]{2,5})/;
                 if (!usernamePatt.test(username)) {
                     show_error_msg("#usernameMsg","用户名可以由5-12位字母，数字下划线组成或2-5位中文！");
+                    $("#registerBtn").attr("username","error");
                 }else{
                     // show_success_msg("#usernameMsg");
                     var username = this.value;
@@ -28,9 +29,10 @@
                             if (data.success === false){
                                 // alert("用户名已经存在");
                                 show_error_msg("#usernameMsg","用户名已经存在！");
-                                $("#registerBtn").attr("send","error");
+                                $("#registerBtn").attr("username","error");
                             }else{
                                 show_success_msg("#usernameMsg","用户名可以使用！");
+                                $("#registerBtn").attr("username","success");
                             }
                         }
                     })
@@ -43,9 +45,10 @@
                 if (!passwordPatt.test(password)) {
                     // alert("密码不合法！");
                     show_error_msg("#passwordMsg");
-                    $("#registerBtn").attr("send","error");
+                    $("#registerBtn").attr("password","error");
                 }else{
                     show_success_msg("#passwordMsg");
+                    $("#registerBtn").attr("password","success");
                 }
             });
             $("#checkPassword").blur(function () {
@@ -55,9 +58,10 @@
                 if (repwd !== password || repwd === "") {
                     // alert("确认密码和密码不一致！");
                     show_error_msg("#checkPasswordMsg");
-                    $("#registerBtn").attr("send","error");
+                    $("#registerBtn").attr("password","error");
                 }else{
                     show_success_msg("#checkPasswordMsg");
+                    $("#registerBtn").attr("password","success");
                 }
             });
 
@@ -68,6 +72,7 @@
                 if (!emailPatt.test(email)) {
                     // alert("邮箱格式不正确！");
                     show_error_msg("#emailMsg","邮箱格式不正确!");
+                    $("#registerBtn").attr("email","error");
                 }else{
                     // show_success_msg("#emailMsg");
                     var email = this.value;
@@ -79,9 +84,10 @@
                             if (data.success === false){
                                 // alert("该邮箱已经被注册啦");
                                 show_error_msg("#emailMsg","该邮箱已经被注册啦！");
-                                $("#registerBtn").attr("send","error");
+                                $("#registerBtn").attr("email","error");
                             }else{
                                 show_success_msg("#emailMsg","邮箱可以使用！");
+                                $("#registerBtn").attr("email","success");
                             }
                         }
                     })
@@ -93,6 +99,7 @@
                 var checkPhone=/^1[2-9]\d{9}$/;
                 if (!checkPhone.test(phone)){
                     show_error_msg("#phoneMsg","该手机号格式错误！");
+                    $("#registerBtn").attr("phoneNum","error");
                 } else {
                     // show_success_msg("#phoneMsg");
                     var phoneNum = this.value;
@@ -104,9 +111,10 @@
                             if (data.success === false){
                                 // alert("该手机号已经存在");
                                 show_error_msg("#phoneMsg","该手机号已经被注册啦！");
-                                $("#registerBtn").attr("send","error");
+                                $("#registerBtn").attr("phoneNum","error");
                             }else{
                                 show_success_msg("#phoneMsg","该手机号可以使用！");
+                                $("#registerBtn").attr("phoneNum","success");
                             }
                         }
                     })
@@ -130,26 +138,36 @@
             $("#registerBtn").click(function () {
                 // alert($("#registerForm").serialize())
                 //如果校验失败不能发送ajax请求
-                if ($(this).attr("send") === "error"){
+                if ($(this).attr("username") === "error"){
                     // alert($(this).attr("send"));
-                    alert("信息有误，请检查填写信息！");
+                    alert("用户名错误！，请检查填写信息！");
                     return false;
-                }
-                $.ajax({
-                    url:"${PATH}/views/register",
-                    type:"POST",
-                    data:$("#registerForm").serialize(),
-                    success:function (data) {
-                        console.log(data);
-                        if (data.success === true){
-                            alert("注册成功");
-                            location.href = "views/goLogin";
-                        }else{
-                            alert("注册失败");
-                            location.href = "views/goRegister";
+                }else if ($(this).attr("password") === "error") {
+                    alert("密码有误！，请检查填写信息！");
+                    return false;
+                }else if ($(this).attr("email") === "error") {
+                    alert("邮箱有误！，请检查填写信息！");
+                    return false;
+                }else if ($(this).attr("phoneNum") === "error") {
+                    alert("手机有误！，请检查填写信息！");
+                    return false;
+                } else {
+                    $.ajax({
+                        url:"${PATH}/views/register",
+                        type:"POST",
+                        data:$("#registerForm").serialize(),
+                        success:function (data) {
+                            console.log(data);
+                            if (data.success === true){
+                                alert("注册成功");
+                                location.href = "views/goLogin";
+                            }else{
+                                alert("注册失败");
+                                location.href = "views/goRegister";
+                            }
                         }
-                    }
-                })
+                    })
+                }
             });
         });
     </script>

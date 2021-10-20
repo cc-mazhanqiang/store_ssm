@@ -90,7 +90,7 @@ public interface ManagerService {
      * @param typeName
      * @return
      */
-    Goods findGoodsByGoodNameAndTypeName(String goodName, String typeName);
+    List<Goods> findGoodsByGoodNameAndTypeName(String goodName, String typeName);
 
     /**
      * 根据添加时间或商品名称查询
