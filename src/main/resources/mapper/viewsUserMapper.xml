@@ -9,6 +9,45 @@
     <result column="email" jdbcType="VARCHAR" property="email" />
     <result column="gender" jdbcType="CHAR" property="gender" />
   </resultMap>
+
+  <resultMap id="address" type="com.whoops.store.bean.Address">
+    <result column="id" jdbcType="INTEGER" property="id"/>
+    <result column="address" jdbcType="VARCHAR" property="address"/>
+    <result column="status" jdbcType="VARCHAR" property="status"/>
+    <result column="addrName" jdbcType="VARCHAR" property="addrName"/>
+    <result column="addrPhone" jdbcType="VARCHAR" property="addrPhone"/>
+    <result column="userId" jdbcType="VARCHAR" property="userId"/>
+    <association property="viewsUser" javaType="com.whoops.store.bean.ViewsUser">
+      <result column="id" jdbcType="INTEGER" property="id" />
+      <result column="username" jdbcType="VARCHAR" property="username" />
+      <result column="password" jdbcType="VARCHAR" property="password" />
+      <result column="phoneNum" jdbcType="VARCHAR" property="phoneNum" />
+      <result column="email" jdbcType="VARCHAR" property="email" />
+      <result column="gender" jdbcType="CHAR" property="gender" />
+    </association>
+  </resultMap>
+
+    <resultMap id="goodType" type="com.whoops.store.bean.GoodsType">
+        <result column="typeId" jdbcType="INTEGER" property="typeId" />
+        <result column="typeName" jdbcType="VARCHAR" property="typeName" />
+    </resultMap>
+
+    <resultMap id="goods" type="com.whoops.store.bean.Goods">
+        <result column="goodId" jdbcType="INTEGER" property="goodId"/>
+        <result column="typeId" jdbcType="INTEGER" property="typeId"/>
+        <result column="goodName" jdbcType="VARCHAR" property="goodName"/>
+        <result column="image" jdbcType="VARCHAR" property="image"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
+        <result column="star" jdbcType="INTEGER" property="star"/>
+        <result column="total" jdbcType="INTEGER" property="total"/>
+        <result column="addTime" jdbcType="DATE" property="addTime"/>
+        <result column="detail" jdbcType="VARCHAR" property="detail"/>
+        <!-- 指定联合查询出的商品种类字段的封装 -->
+        <association property="goodsType" javaType="com.whoops.store.bean.GoodsType">
+            <result column="typeId" jdbcType="INTEGER" property="typeId"/>
+            <result column="typeName" jdbcType="VARCHAR" property="typeName"/>
+        </association>
+    </resultMap>
   <select id="selectByUserNameAndPassword" resultMap="BaseResultMap">
     select * from views_user where
     username = #{username,jdbcType=VARCHAR} and password = #{password,jdbcType=VARCHAR}
@@ -29,4 +68,79 @@
     insert into views_user(username,password,phoneNum,email,gender)
     values(#{username,jdbcType=VARCHAR},#{password,jdbcType=VARCHAR},#{phoneNum,jdbcType=VARCHAR},#{email,jdbcType=VARCHAR},#{gender,jdbcType=CHAR})
   </insert>
+
+  <select id="getUserById" resultMap="BaseResultMap">
+    select * from views_user where id = #{userId}
+  </select>
+
+  <update id="updateUser">
+    update views_user set username = #{viewsUser.username},password = #{viewsUser.password},
+    phoneNum = #{viewsUser.phoneNum},email = #{viewsUser.email},gender = #{viewsUser.gender}
+    where id = #{userId}
+  </update>
+
+  <select id="getAddr" resultMap="address">
+    select addr.id,addr.address,addr.addrPhone,addr.addrName,addr.status,addr.userId from address addr
+    left join views_user vs
+    on addr.userId = vs.id
+    where vs.id = #{userId}
+    order by addr.id
+  </select>
+
+  <delete id="delAddr">
+    delete from address where id = #{addrId}
+  </delete>
+
+  <update id="updateAddr">
+    update address addr,views_user vs set addr.address = #{address},addr.addrPhone = #{addrPhone},
+    addr.addrName = #{addrName}
+    where addr.userId = vs.id and addr.id = #{addrId}
+  </update>
+
+    <insert id="addAddress" parameterType="com.whoops.store.bean.Address">
+        insert into address(address,status,addrName,addrPhone,userId)
+        values (#{address},#{status},#{addrName},#{addrPhone},#{userId})
+    </insert>
+
+    <update id="makeStatus">
+        update address set status = #{status}
+        where userId = #{userId}
+    </update>
+
+    <update id="makeDefault">
+        update address set status = #{address.status}
+        where id = #{addrId}
+    </update>
+
+    <select id="findAddress" resultMap="address">
+        select * from address where userId = #{userId}
+    </select>
+
+    <select id="findgoodsType" resultMap="goodType">
+        select * from goodstype
+    </select>
+
+    <select id="showGoods" resultMap="goods">
+        select * from goods g
+        left join goodstype gt
+        on g.typeId = gt.typeId
+        where gt.typeId = #{typeId}
+    </select>
+
+    <select id="goodsDetail" resultMap="goods">
+        select * from goods where goodId = #{goodId}
+    </select>
+
+    <select id="findGoodsMore" resultMap="goods">
+        select * from goods
+    </select>
+
+    <select id="findGoodsById" resultMap="goods">
+        select * from goods where goodId = #{goodId}
+    </select>
+
+    <update id="updateTotal">
+        update goods set total = #{total} where goodId = #{goodId}
+    </update>
+
 </mapper>

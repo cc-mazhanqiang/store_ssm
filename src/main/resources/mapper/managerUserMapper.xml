@@ -38,6 +38,22 @@
     </association>
   </resultMap>
 
+  <resultMap id="order" type="com.whoops.store.bean.Order">
+    <result column="orderNum" jdbcType="BIGINT" property="orderNum" />
+    <result column="goodId" jdbcType="INTEGER" property="goodId" />
+    <result column="goodName" jdbcType="VARCHAR" property="goodName" />
+    <result column="price" jdbcType="DECIMAL" property="price" />
+    <result column="count" jdbcType="INTEGER" property="count" />
+    <result column="userId" jdbcType="INTEGER" property="userId" />
+    <result column="addrId" jdbcType="INTEGER" property="addrId" />
+    <result column="addrName" jdbcType="VARCHAR" property="addrName" />
+    <result column="orderStatus" jdbcType="VARCHAR" property="orderStatus" />
+    <association property="viewsUser" javaType="com.whoops.store.bean.ViewsUser">
+      <result column="id" jdbcType="INTEGER" property="id" />
+      <result column="username" jdbcType="VARCHAR" property="username" />
+    </association>
+  </resultMap>
+
   <select id="selectByUserNameAndPassword" resultMap="BaseResultMap">
     select * from manager_user where
     username = #{username,jdbcType=VARCHAR} and password = #{password,jdbcType=VARCHAR}
@@ -121,5 +137,23 @@
     update goods set price = #{goods.price},total = #{goods.total},star = #{goods.star}
     where goodId = #{goodId}
   </update>
+
+  <select id="findAllOrders" resultMap="order">
+    select * from `order` o
+    left join views_user vs
+    on o.userId = vs.id
+  </select>
+
+  <update id="updateOrderStatus">
+    update `order` set orderStatus = #{orderStatus}
+    where orderNum = #{orderNum}
+  </update>
+
+  <select id="findOrdersByStatus" resultMap="order">
+    select * from `order` o
+    left join views_user vs
+    on o.userId = vs.id
+    where orderStatus = #{orderStatus}
+  </select>
 
 </mapper>

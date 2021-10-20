@@ -1,9 +1,6 @@
 package com.whoops.store.dao;
 
-import com.whoops.store.bean.Goods;
-import com.whoops.store.bean.GoodsType;
-import com.whoops.store.bean.ManagerUser;
-import com.whoops.store.bean.ViewsUser;
+import com.whoops.store.bean.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -39,4 +36,10 @@ public interface ManagerUserMapper {
     Goods getGoodsById(@Param("goodId") Integer goodId);
 
     int updateGoods(@Param("goods") Goods goods, @Param("goodId")Integer goodId);
+
+    List<Order> findAllOrders();
+
+    int updateOrderStatus(@Param("orderNum") Long orderNum,@Param("orderStatus") String orderStatus);
+
+    List<Order> findOrdersByStatus(@Param("orderStatus")String orderStatus);
 }

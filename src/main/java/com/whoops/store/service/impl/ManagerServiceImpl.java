@@ -1,9 +1,6 @@
 package com.whoops.store.service.impl;
 
-import com.whoops.store.bean.Goods;
-import com.whoops.store.bean.GoodsType;
-import com.whoops.store.bean.ManagerUser;
-import com.whoops.store.bean.ViewsUser;
+import com.whoops.store.bean.*;
 import com.whoops.store.dao.ManagerUserMapper;
 import com.whoops.store.service.ManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,5 +97,20 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public int updateGoods(Goods goods, Integer goodId) {
         return managerUserMapper.updateGoods(goods,goodId);
+    }
+
+    @Override
+    public List<Order> findAllOrders() {
+        return managerUserMapper.findAllOrders();
+    }
+
+    @Override
+    public int updateOrderStatus(Long orderNum,String orderStatus) {
+        return managerUserMapper.updateOrderStatus(orderNum,orderStatus);
+    }
+
+    @Override
+    public List<Order> findOrdersByStatus(String orderStatus) {
+        return managerUserMapper.findOrdersByStatus(orderStatus);
     }
 }

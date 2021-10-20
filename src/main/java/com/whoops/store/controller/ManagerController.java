@@ -2,10 +2,7 @@ package com.whoops.store.controller;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.whoops.store.bean.Goods;
-import com.whoops.store.bean.GoodsType;
-import com.whoops.store.bean.ManagerUser;
-import com.whoops.store.bean.ViewsUser;
+import com.whoops.store.bean.*;
 import com.whoops.store.service.ManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,6 +13,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -53,6 +51,11 @@ public class ManagerController {
         return map;
     }
 
+    /**
+     * 获取所有的用户
+     * @param pageNum
+     * @return
+     */
     @ResponseBody
     @GetMapping("/manager/getUserList")
     public Map<String,Object> getUserList(@RequestParam(value = "pageNum",defaultValue = "1")Integer pageNum){
@@ -330,9 +333,12 @@ public class ManagerController {
     @GetMapping("/manager/searchGoods")
     public Map<String,Object> searchGoods(@RequestParam(value = "pageNum",defaultValue = "1")Integer pageNum,@RequestParam("condition")String condition){
         Map<String,Object> map = new HashMap<>();
+        //处理返回的数据的容器名称list
+        List<Map<String,Object>> list = new ArrayList<>();
         try {
+            Map<String,Object> ret = new HashMap<>();
             if (condition.contains(",")){
-                //多条件查询adasd,2021-10-05
+                //多条件查询adasd,饮品
                 String[] str_cons = condition.split(",");
                 String goodName = null;
                 String typeName = null;
@@ -343,7 +349,9 @@ public class ManagerController {
                 System.out.println(goodName+","+typeName);
                 Goods goods = managerService.findGoodsByGoodNameAndTypeName(goodName,typeName);
                 if (goods == null)throw new Exception("没有查询到相关的商品！");
-                map.put("goods",goods);
+                ret.put("list",goods);
+                list.add(ret);
+                map.put("page",list);
                 map.put("success",true);
                 map.put("msg","查询商品成功！");
             }else{
@@ -355,6 +363,7 @@ public class ManagerController {
                 //navigatePage:分页导航条的显示
                 PageInfo pageInfo = new PageInfo(goodsList,5);
                 System.out.println(pageInfo);
+                //默认会使用list别名存放数据
                 map.put("page",pageInfo);
                 map.put("success",true);
                 map.put("msg","查询商品成功！");
@@ -409,6 +418,152 @@ public class ManagerController {
         } catch (Exception e) {
             map.put("success",false);
             map.put("msg","修改商品信息失败！");
+            map.put("exc",e.toString());
+        }
+        return map;
+    }
+
+    /**
+     * 查询用户的所用订单
+     * @return
+     */
+    @ResponseBody
+    @GetMapping("/manager/showAllOrders")
+    public Map<String,Object> showAllOrders(){
+        Map<String,Object> map = new HashMap<>();
+        List<Map<String,Object>> list = new ArrayList<>();
+        try {
+            List<Order> orderList = managerService.findAllOrders();
+            if (orderList == null || orderList.size() == 0)throw new Exception("没有该用户的相关订单信息！");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh");
+            for (Order order : orderList) {
+                Map<String,Object> ret = new HashMap<>();
+                Long orderNum = order.getOrderNum();
+                String format = simpleDateFormat.format(orderNum);
+                ret.put("time",format);
+                list.add(ret);
+            }
+            map.put("dateList",list);
+            map.put("orderList",orderList);
+            map.put("success",true);
+            map.put("msg","查询用户订单成功！");
+        } catch (Exception e) {
+            map.put("success",false);
+            map.put("msg","没有该用户的相关订单信息！");
+            map.put("exc",e.toString());
+        }
+        return map;
+    }
+
+    /**
+     * 卖家发货
+     * @param orderNum
+     * @return
+     */
+    @ResponseBody
+    @PostMapping("/manager/sendOrders")
+    public Map<String,Object> sendOrders(@RequestParam("orderNum")Long orderNum){
+        Map<String,Object> map = new HashMap<>();
+        try {
+            Order order = new Order();
+            order.setOrderStatus("已发货");
+            int count = managerService.updateOrderStatus(orderNum,order.getOrderStatus());
+            if (count == 0)throw new Exception("发货失败！");
+            map.put("success",true);
+            map.put("msg","发货成功！");
+        } catch (Exception e) {
+            map.put("success",false);
+            map.put("msg","发货失败！");
+            map.put("exc",e.toString());
+        }
+        return map;
+    }
+
+    /**
+     * 根据状态查询订单
+     * @return
+     */
+    @ResponseBody
+    @GetMapping("/manager/searchOrderStatus")
+    public Map<String,Object> searchOrderStatus(@RequestParam("type")Integer type){
+        Map<String,Object> map = new HashMap<>();
+        List<Map<String,Object>> list = new ArrayList<>();
+        try {
+            if (type == 0){
+                //查询所有的订单
+                List<Order> allOrders = managerService.findAllOrders();
+                if (allOrders == null || allOrders.size() == 0)throw new Exception("没有该用户的相关订单信息！");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh");
+                for (Order order : allOrders) {
+                    Map<String,Object> ret = new HashMap<>();
+                    Long orderNum = order.getOrderNum();
+                    String format = simpleDateFormat.format(orderNum);
+                    ret.put("time",format);
+                    list.add(ret);
+                }
+                map.put("dateList",list);
+                map.put("orderList",allOrders);
+                map.put("success",true);
+                map.put("msg","查询用户订单成功！");
+            }else if (type == 1){
+                //查询买家已支付，等待发货...的订单
+                Order order = new Order();
+                order.setOrderStatus("待商家发货");
+                System.out.println(order.getOrderStatus());
+                List<Order> allOrders = managerService.findOrdersByStatus(order.getOrderStatus());
+                if (allOrders == null || allOrders.size() == 0)throw new Exception("没有该用户的相关订单信息！");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh");
+                for (Order orders : allOrders) {
+                    Map<String,Object> ret = new HashMap<>();
+                    Long orderNum = orders.getOrderNum();
+                    String format = simpleDateFormat.format(orderNum);
+                    ret.put("time",format);
+                    list.add(ret);
+                }
+                map.put("dateList",list);
+                map.put("orderList",allOrders);
+                map.put("success",true);
+                map.put("msg","查询用户订单成功！");
+            }else if (type == 2){
+                //查询买家未支付...的订单
+                Order order = new Order();
+                order.setOrderStatus("待提交订单");
+                List<Order> allOrders = managerService.findOrdersByStatus(order.getOrderStatus());
+                if (allOrders == null || allOrders.size() == 0)throw new Exception("没有该用户的相关订单信息！");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh");
+                for (Order orders : allOrders) {
+                    Map<String,Object> ret = new HashMap<>();
+                    Long orderNum = orders.getOrderNum();
+                    String format = simpleDateFormat.format(orderNum);
+                    ret.put("time",format);
+                    list.add(ret);
+                }
+                map.put("dateList",list);
+                map.put("orderList",allOrders);
+                map.put("success",true);
+                map.put("msg","查询用户订单成功！");
+            }else if (type == 3){
+                //查询已发货的订单
+                Order order = new Order();
+                order.setOrderStatus("已发货");
+                List<Order> allOrders = managerService.findOrdersByStatus(order.getOrderStatus());
+                if (allOrders == null || allOrders.size() == 0)throw new Exception("没有该用户的相关订单信息！");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh");
+                for (Order orders : allOrders) {
+                    Map<String,Object> ret = new HashMap<>();
+                    Long orderNum = orders.getOrderNum();
+                    String format = simpleDateFormat.format(orderNum);
+                    ret.put("time",format);
+                    list.add(ret);
+                }
+                map.put("dateList",list);
+                map.put("orderList",allOrders);
+                map.put("success",true);
+                map.put("msg","查询用户订单成功！");
+            }
+        } catch (Exception e) {
+            map.put("success",false);
+            map.put("msg","没有该用户的相关订单信息！");
             map.put("exc",e.toString());
         }
         return map;

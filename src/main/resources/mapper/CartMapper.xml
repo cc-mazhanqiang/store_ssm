@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.whoops.store.dao.CartMapper">
+  <resultMap id="cart" type="com.whoops.store.bean.Cart">
+    <result column="cartId" jdbcType="INTEGER" property="cartId" />
+    <result column="goodId" jdbcType="INTEGER" property="goodId" />
+    <result column="goodName" jdbcType="VARCHAR" property="goodName" />
+    <result column="price" jdbcType="DECIMAL" property="price" />
+    <result column="count" jdbcType="INTEGER" property="count" />
+    <result column="userId" jdbcType="INTEGER" property="userId" />
+  </resultMap>
+
+    <resultMap id="cartGoods" type="com.whoops.store.bean.Goods">
+        <result column="goodId" jdbcType="INTEGER" property="goodId"/>
+        <result column="typeId" jdbcType="INTEGER" property="typeId"/>
+        <result column="goodName" jdbcType="VARCHAR" property="goodName"/>
+        <result column="image" jdbcType="VARCHAR" property="image"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
+        <result column="star" jdbcType="INTEGER" property="star"/>
+        <result column="total" jdbcType="INTEGER" property="total"/>
+        <result column="addTime" jdbcType="DATE" property="addTime"/>
+        <result column="detail" jdbcType="VARCHAR" property="detail"/>
+    </resultMap>
+
+    <select id="findCartByGoodId" resultMap="cart">
+        select * from cart where goodId = #{goodId}
+    </select>
+
+    <insert id="addCartGoods" parameterType="com.whoops.store.bean.Cart">
+        insert into cart(goodId,goodName,price,`count`,userId)
+        values(#{goodId},#{goodName},#{price},#{count},#{userId})
+    </insert>
+
+    <update id="updateCount">
+        update cart set `count` = #{count} where goodId = #{goodId}
+    </update>
+
+    <select id="findCartByUserId" resultMap="cart">
+        select * from cart where userId = #{userId}
+    </select>
+
+    <select id="findCartByCartId" resultMap="cart">
+        select * from cart where cartId = #{cartId}
+    </select>
+
+    <delete id="removeAllCart">
+        delete from cart where userId = #{userId}
+    </delete>
+
+    <delete id="delCartById">
+         delete from cart where cartId = #{cartId}
+    </delete>
+
+</mapper>

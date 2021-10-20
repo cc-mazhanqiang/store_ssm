@@ -36,7 +36,7 @@
 			})
 		}
 
-		//显示商品信息
+		//显示商品信息返回的数据是list
 		function showMsg(data){
 			//每次刷新清空表格数据
 			$("tbody").empty();
@@ -66,7 +66,6 @@
 						.append(btn).appendTo($("tbody"));
 			});
 		}
-
 		//显示分页信息
 		function page_info(data) {
 			$("#page_info").empty();
@@ -325,9 +324,9 @@
 				var span = $("<span></span>").append(goods.detail);
 				span.appendTo(ele2);
 
-				$("#price").val(goods.price);
-				$("#total").val(goods.total);
-				$("#star").val(goods.star);
+				$(ele3).val(goods.price);
+				$(ele4).val(goods.total);
+				$(ele5).val(goods.star);
 			}
 
 			//给减号绑定单击事件

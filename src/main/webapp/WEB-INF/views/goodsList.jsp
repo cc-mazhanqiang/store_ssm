@@ -1,7 +1,5 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="utf-8"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="utf-8"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -15,9 +13,10 @@
 	<script type="text/javascript" src="${PATH}/static/bootstrap-3.4.1-dist/js/bootstrap.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
-			$('#con').load('head');
-			$("#con1").load('foot')
-		})
+			$("#con").load('head');
+			$("#con1").load('foot');
+		});
+
 	</script>
 <title>xyz-商品列表页</title>
 </head>
@@ -30,23 +29,23 @@
 	<div class="panel-body">
 	   	<!--列表开始-->
 	    <div class="row" style="margin: 0 auto;">
-	    	<c:forEach items="${glist}" var="g" varStatus="i">
+	    	<c:forEach items="${list}" var="goods">
 		    	<div class="col-sm-3">
 				    <div class="thumbnail">
-				      <img src="./fmwimages/${g.picture}" width="180" height="180"  alt="小米6" />
-				      <div class="caption">
-				        <h4>商品名称：<a href="${pageContext.request.contextPath}/getGoodsById?id=${g.id}">${g.name}</a></h4>
+				      <img src="${PATH}/${goods.image}" width="180" height="180"  alt="" />
+				      <div class="caption" style="text-align: center">
+				        <h4>商品名称：<a href="${PATH}/views/goodsDetail?goodId=${goods.goodId}">${goods.goodName}</a></h4>
 				        <p>热销指数：
-				        	<c:forEach begin="1" end="${g.star}">
-				        		<img src="image/star_red.gif" alt="star"/>
+				        	<c:forEach begin="1" end="${goods.star}">
+				        		<img src="${PATH}/static/image/star_red.gif" alt="star"/>
 				        	</c:forEach>
 				        </p>
-				         <p>上架日期：${g.pubdate}</p>
-			             <p style="color:orange">价格：${g.price} 元</p>
+				         <p>上架日期：${goods.addTime}</p>
+			             <p style="color:orange">价格：${goods.price} 元</p>
 				      </div>
 				    </div>
 				  </div>
-	    	</c:forEach>  
+			</c:forEach>
 		</div>
    	</div>
 </div>

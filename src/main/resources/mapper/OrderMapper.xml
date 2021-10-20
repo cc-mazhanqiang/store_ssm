@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.whoops.store.dao.OrderMapper">
+  <resultMap id="order" type="com.whoops.store.bean.Order">
+    <result column="orderNum" jdbcType="BIGINT" property="orderNum" />
+    <result column="goodId" jdbcType="INTEGER" property="goodId" />
+    <result column="goodName" jdbcType="VARCHAR" property="goodName" />
+    <result column="price" jdbcType="DECIMAL" property="price" />
+    <result column="count" jdbcType="INTEGER" property="count" />
+    <result column="userId" jdbcType="INTEGER" property="userId" />
+    <result column="addrId" jdbcType="INTEGER" property="addrId" />
+    <result column="addrName" jdbcType="VARCHAR" property="addrName" />
+    <result column="orderStatus" jdbcType="VARCHAR" property="orderStatus" />
+  </resultMap>
+
+    <resultMap id="address" type="com.whoops.store.bean.Address">
+        <result column="id" jdbcType="INTEGER" property="id"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="addrName" jdbcType="VARCHAR" property="addrName"/>
+        <result column="addrPhone" jdbcType="VARCHAR" property="addrPhone"/>
+        <result column="userId" jdbcType="VARCHAR" property="userId"/>
+        <association property="viewsUser" javaType="com.whoops.store.bean.ViewsUser">
+            <result column="id" jdbcType="INTEGER" property="id" />
+            <result column="username" jdbcType="VARCHAR" property="username" />
+            <result column="password" jdbcType="VARCHAR" property="password" />
+            <result column="phoneNum" jdbcType="VARCHAR" property="phoneNum" />
+            <result column="email" jdbcType="VARCHAR" property="email" />
+            <result column="gender" jdbcType="CHAR" property="gender" />
+        </association>
+    </resultMap>
+
+    <insert id="addOrders" parameterType="com.whoops.store.bean.Order">
+        insert into `order`(orderNum,goodId,goodName,price,`count`,userId,orderStatus)
+        values(#{orderNum},#{goodId},#{goodName},#{price},#{count},#{userId},#{orderStatus})
+    </insert>
+
+    <select id="findOrdersByUserId" resultMap="order">
+        select * from `order` where userId = #{userId}
+    </select>
+
+    <select id="findAddressByAddrId" resultMap="address">
+        select id,address from address where id = #{addrId}
+    </select>
+
+    <update id="updateOrdersAddress">
+        update `order` set addrId = #{addrId},address = #{addresses},orderStatus = #{orderStatus}
+         where orderNum = #{orderNum}
+    </update>
+
+</mapper>

@@ -1,9 +1,6 @@
 package com.whoops.store.service;
 
-import com.whoops.store.bean.Goods;
-import com.whoops.store.bean.GoodsType;
-import com.whoops.store.bean.ManagerUser;
-import com.whoops.store.bean.ViewsUser;
+import com.whoops.store.bean.*;
 
 import java.util.List;
 
@@ -116,4 +113,24 @@ public interface ManagerService {
      * @return
      */
     int updateGoods(Goods goods, Integer goodId);
+
+    /**
+     * 查询用户的所有订单
+     * @return
+     */
+    List<Order> findAllOrders();
+
+    /**
+     * 卖家发货
+     * @param orderNum
+     * @return
+     */
+    int updateOrderStatus(Long orderNum,String orderStatus);
+
+    /**
+     * 根据订单状态查询订单
+     * @param orderStatus
+     * @return
+     */
+    List<Order> findOrdersByStatus(String orderStatus);
 }
