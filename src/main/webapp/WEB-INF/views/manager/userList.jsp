@@ -310,6 +310,7 @@
 								<tr class="tr_head">
 									<th style="text-align: center">编号</th>
 									<th style="text-align: center">姓名</th>
+									<th style="text-align: center">电话</th>
 									<th style="text-align: center">邮箱</th>
 									<th style="text-align: center">性别</th>
 									<th style="text-align: center">操作</th>
